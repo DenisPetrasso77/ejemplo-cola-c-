@@ -25,7 +25,7 @@ namespace ColaAnimadaCool
         private int index = 0;
 
         // Tamaños
-        private int panelHeight = 70;
+        private int panelHeight = 60;
         private int espacio = 12;
 
         // Márgenes
@@ -37,7 +37,7 @@ namespace ColaAnimadaCool
         {
             // Form principal
             this.Text = "Cola Animada con Estilo";
-            this.Size = new Size(520, 900);
+            this.Size = new Size(520, 700);
             this.BackColor = Color.FromArgb(45, 45, 48);
 
             // Panel contenedor centrado con márgenes iguales
@@ -63,9 +63,8 @@ namespace ColaAnimadaCool
             btnDesencolar.Click += BtnDesencolar_Click;
             this.Controls.Add(btnDesencolar);
 
-            btnInfo = CrearBoton("ℹ️ Info de la Cola", Color.SeaGreen, botonesTop + 120);
-            btnInfo.Click += BtnInfo_Click;
-            this.Controls.Add(btnInfo);
+            //btnInfo = CrearBoton("ℹ️ Info de la Cola", Color.SeaGreen, botonesTop + 120);
+            //this.Controls.Add(btnInfo);
 
             btnVer = CrearBoton("👁️ Ver (Peek)", Color.MediumPurple, botonesTop + 180);
             btnVer.Click += BtnVer_Click;
@@ -115,13 +114,13 @@ namespace ColaAnimadaCool
             }
         }
 
-        private void BtnInfo_Click(object sender, EventArgs e)
-        {
-            string inicio = cola.Count > 0 ? cola.Peek().Item1 : "Ninguno";
-            string fin = cola.Count > 0 ? cola.ToArray()[cola.Count - 1].Item1 : "Ninguno";
+        //private void BtnInfo_Click(object sender, EventArgs e)
+        //{
+        //    string inicio = cola.Count > 0 ? cola.Peek().Item1 : "Ninguno";
+        //    string fin = cola.Count > 0 ? cola.ToArray()[cola.Count - 1].Item1 : "Ninguno";
 
-            MessageBox.Show($"Tamaño: {cola.Count}\nInicio: {inicio}\nFin: {fin}", "Información de la Cola");
-        }
+        //    MessageBox.Show($"Tamaño: {cola.Count}\nInicio: {inicio}\nFin: {fin}", "Información de la Cola");
+        //}
 
         // NUEVO: Ver (Peek)
         private void BtnVer_Click(object sender, EventArgs e)
