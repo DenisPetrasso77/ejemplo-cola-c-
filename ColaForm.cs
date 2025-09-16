@@ -25,6 +25,7 @@ namespace ColaAnimadaCool
         private int index = 0;
 
         // Tamaños
+        private int panelWidth = 120;
         private int panelHeight = 60;
         private int espacio = 12;
 
@@ -36,35 +37,37 @@ namespace ColaAnimadaCool
         public ColaForm()
         {
             // Form principal
-            this.Text = "Cola Animada con Estilo";
-            this.Size = new Size(520, 700);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Text = "Cola Animada con Estilo (Horizontal)";
+            this.Size = new Size(880, 600);
             this.BackColor = Color.FromArgb(45, 45, 48);
 
-            // Panel contenedor centrado con márgenes iguales
+            // Panel contenedor (horizontal)
             panelContenedor = new Panel()
             {
                 Location = new Point(margenHorizontal, margenVerticalSuperior),
                 Size = new Size(this.ClientSize.Width - margenHorizontal * 2,
-                                this.ClientSize.Height - 300 - margenVerticalSuperior - margenVerticalInferior),
+                                150),
                 BackColor = Color.White,
                 AutoScroll = true,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
             this.Controls.Add(panelContenedor);
 
-            // Botones al fondo con margen inferior
+            // Botones debajo del panel
             int botonesTop = panelContenedor.Bottom + 30;
 
-            btnEncolar = CrearBoton("➕ Encolar", Color.RoyalBlue, botonesTop);
+            btnEncolar = CrearBoton("➕ Enqueue", Color.RoyalBlue, botonesTop);
             btnEncolar.Click += BtnEncolar_Click;
             this.Controls.Add(btnEncolar);
 
-            btnDesencolar = CrearBoton("➖ Desencolar", Color.Goldenrod, botonesTop + 60);
+            btnDesencolar = CrearBoton("➖ Dequeue", Color.Goldenrod, botonesTop + 60);
             btnDesencolar.Click += BtnDesencolar_Click;
             this.Controls.Add(btnDesencolar);
 
-            //btnInfo = CrearBoton("ℹ️ Info de la Cola", Color.SeaGreen, botonesTop + 120);
-            //this.Controls.Add(btnInfo);
+            btnInfo = CrearBoton("ℹ️ Info de la Queue", Color.SeaGreen, botonesTop + 120);
+            btnInfo.Click += BtnInfo_Click;
+            this.Controls.Add(btnInfo);
 
             btnVer = CrearBoton("👁️ Ver (Peek)", Color.MediumPurple, botonesTop + 180);
             btnVer.Click += BtnVer_Click;
@@ -114,15 +117,14 @@ namespace ColaAnimadaCool
             }
         }
 
-        //private void BtnInfo_Click(object sender, EventArgs e)
-        //{
-        //    string inicio = cola.Count > 0 ? cola.Peek().Item1 : "Ninguno";
-        //    string fin = cola.Count > 0 ? cola.ToArray()[cola.Count - 1].Item1 : "Ninguno";
+        private void BtnInfo_Click(object sender, EventArgs e)
+        {
+            string inicio = cola.Count > 0 ? cola.Peek().Item1 : "Ninguno";
+            string fin = cola.Count > 0 ? cola.ToArray()[cola.Count - 1].Item1 : "Ninguno";
 
-        //    MessageBox.Show($"Tamaño: {cola.Count}\nInicio: {inicio}\nFin: {fin}", "Información de la Cola");
-        //}
+            MessageBox.Show($"Tamaño: {cola.Count}\nInicio: {inicio}\nFin: {fin}", "Información de la Cola");
+        }
 
-        // NUEVO: Ver (Peek)
         private void BtnVer_Click(object sender, EventArgs e)
         {
             if (cola.Count == 0)
@@ -135,7 +137,6 @@ namespace ColaAnimadaCool
             MessageBox.Show($"El primer elemento es: {primero.Item1}", "Ver (Peek)");
         }
 
-        // NUEVO: Buscar (con formulario propio)
         private void BtnBuscar_Click(object sender, EventArgs e)
         {
             if (cola.Count == 0)
@@ -193,7 +194,7 @@ namespace ColaAnimadaCool
                     {
                         if (arr[i].Item1.Equals(input, StringComparison.OrdinalIgnoreCase))
                         {
-                            posiciones.Add(i + 1); // sumamos 1 porque la cola empieza en 1, no en 0
+                            posiciones.Add(i + 1);
                         }
                     }
 
@@ -209,29 +210,28 @@ namespace ColaAnimadaCool
                         MessageBox.Show($"Elemento '{input}' no encontrado en la cola.", "Buscar");
                     }
                 }
-
             }
         }
 
-        // Dibuja toda la cola (sin animaciones)
+        // Dibuja toda la cola (horizontal, sin animaciones)
         private void DibujarCola()
         {
             panelContenedor.Controls.Clear();
 
-            int y = 10;
+            int x = 10;
             foreach (var item in cola)
             {
-                var p = CrearPanelItem(item.Item1, item.Item2, y);
+                var p = CrearPanelItem(item.Item1, item.Item2, x);
                 panelContenedor.Controls.Add(p);
-                y += panelHeight + espacio;
+                x += panelWidth + espacio;
             }
         }
 
-        // Dibuja con animación de entrada
+        // Dibuja con animación de entrada (horizontal)
         private void DibujarColaAnimadoEntrada(Tuple<string, Color> nuevo)
         {
             panelContenedor.Controls.Clear();
-            int y = 10;
+            int x = 10;
 
             int count = cola.Count;
             int i = 0;
@@ -239,30 +239,29 @@ namespace ColaAnimadaCool
             {
                 if (i == count - 1)
                 {
-                    // Este es el nuevo: animado
-                    var p = CrearPanelItem(item.Item1, item.Item2, y);
-                    // posición inicial fuera de pantalla
-                    p.Left = -p.Width;
+                    var p = CrearPanelItem(item.Item1, item.Item2, x);
+                    p.Top = 10;
+                    p.Left = -p.Width; // arranca fuera de pantalla
                     panelContenedor.Controls.Add(p);
-                    AnimarEntrada(p, new Point(10, y));
+                    AnimarEntrada(p, new Point(x, 10));
                 }
                 else
                 {
-                    var p = CrearPanelItem(item.Item1, item.Item2, y);
+                    var p = CrearPanelItem(item.Item1, item.Item2, x);
                     panelContenedor.Controls.Add(p);
                 }
-                y += panelHeight + espacio;
+                x += panelWidth + espacio;
                 i++;
             }
         }
 
-        private Panel CrearPanelItem(string texto, Color color, int y)
+        private Panel CrearPanelItem(string texto, Color color, int x)
         {
             Panel p = new Panel()
             {
-                Size = new Size(panelContenedor.Width - 20, panelHeight),
+                Size = new Size(panelWidth, panelHeight),
                 BackColor = color,
-                Location = new Point(10, y),
+                Location = new Point(x, 10),
                 BorderStyle = BorderStyle.None
             };
 
