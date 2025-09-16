@@ -14,6 +14,8 @@ namespace ColaAnimadaCool
         private Button btnEncolar;
         private Button btnDesencolar;
         private Button btnInfo;
+        private Button btnVer;
+        private Button btnBuscar;
 
         private Tuple<string, Color>[] opciones = new Tuple<string, Color>[] {
             Tuple.Create("Rojo", Color.Red),
@@ -35,7 +37,7 @@ namespace ColaAnimadaCool
         {
             // Form principal
             this.Text = "Cola Animada con Estilo";
-            this.Size = new Size(520, 780);
+            this.Size = new Size(520, 900);
             this.BackColor = Color.FromArgb(45, 45, 48);
 
             // Panel contenedor centrado con márgenes iguales
@@ -43,7 +45,7 @@ namespace ColaAnimadaCool
             {
                 Location = new Point(margenHorizontal, margenVerticalSuperior),
                 Size = new Size(this.ClientSize.Width - margenHorizontal * 2,
-                                this.ClientSize.Height - 180 - margenVerticalSuperior - margenVerticalInferior),
+                                this.ClientSize.Height - 300 - margenVerticalSuperior - margenVerticalInferior),
                 BackColor = Color.White,
                 AutoScroll = true,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
@@ -64,6 +66,14 @@ namespace ColaAnimadaCool
             btnInfo = CrearBoton("ℹ️ Info de la Cola", Color.SeaGreen, botonesTop + 120);
             btnInfo.Click += BtnInfo_Click;
             this.Controls.Add(btnInfo);
+
+            btnVer = CrearBoton("👁️ Ver (Peek)", Color.MediumPurple, botonesTop + 180);
+            btnVer.Click += BtnVer_Click;
+            this.Controls.Add(btnVer);
+
+            btnBuscar = CrearBoton("🔍 Buscar", Color.IndianRed, botonesTop + 240);
+            btnBuscar.Click += BtnBuscar_Click;
+            this.Controls.Add(btnBuscar);
         }
 
         private Button CrearBoton(string texto, Color color, int y)
@@ -113,6 +123,97 @@ namespace ColaAnimadaCool
             MessageBox.Show($"Tamaño: {cola.Count}\nInicio: {inicio}\nFin: {fin}", "Información de la Cola");
         }
 
+        // NUEVO: Ver (Peek)
+        private void BtnVer_Click(object sender, EventArgs e)
+        {
+            if (cola.Count == 0)
+            {
+                MessageBox.Show("La cola está vacía.", "Ver (Peek)");
+                return;
+            }
+
+            var primero = cola.Peek();
+            MessageBox.Show($"El primer elemento es: {primero.Item1}", "Ver (Peek)");
+        }
+
+        // NUEVO: Buscar (con formulario propio)
+        private void BtnBuscar_Click(object sender, EventArgs e)
+        {
+            if (cola.Count == 0)
+            {
+                MessageBox.Show("La cola está vacía.", "Buscar");
+                return;
+            }
+
+            using (Form inputForm = new Form())
+            {
+                inputForm.Text = "Buscar en la Cola";
+                inputForm.Size = new Size(300, 150);
+                inputForm.StartPosition = FormStartPosition.CenterParent;
+                inputForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+                inputForm.MaximizeBox = false;
+                inputForm.MinimizeBox = false;
+
+                Label lbl = new Label()
+                {
+                    Text = "Ingrese el color a buscar:",
+                    Dock = DockStyle.Top,
+                    TextAlign = ContentAlignment.MiddleCenter
+                };
+                inputForm.Controls.Add(lbl);
+
+                TextBox txt = new TextBox()
+                {
+                    Dock = DockStyle.Top,
+                    Margin = new Padding(10),
+                    TextAlign = HorizontalAlignment.Center
+                };
+                inputForm.Controls.Add(txt);
+
+                Button btnOk = new Button()
+                {
+                    Text = "Buscar",
+                    Dock = DockStyle.Bottom
+                };
+                inputForm.Controls.Add(btnOk);
+
+                string input = null;
+                btnOk.Click += (s, ev) =>
+                {
+                    input = txt.Text;
+                    inputForm.DialogResult = DialogResult.OK;
+                    inputForm.Close();
+                };
+
+                if (inputForm.ShowDialog(this) == DialogResult.OK && !string.IsNullOrWhiteSpace(input))
+                {
+                    var arr = cola.ToArray();
+                    List<int> posiciones = new List<int>();
+
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        if (arr[i].Item1.Equals(input, StringComparison.OrdinalIgnoreCase))
+                        {
+                            posiciones.Add(i + 1); // sumamos 1 porque la cola empieza en 1, no en 0
+                        }
+                    }
+
+                    if (posiciones.Count > 0)
+                    {
+                        string lista = string.Join(", ", posiciones);
+                        MessageBox.Show(
+                            $"Elemento '{input}' encontrado en las posiciones: {lista}.",
+                            "Buscar");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Elemento '{input}' no encontrado en la cola.", "Buscar");
+                    }
+                }
+
+            }
+        }
+
         // Dibuja toda la cola (sin animaciones)
         private void DibujarCola()
         {
@@ -158,7 +259,6 @@ namespace ColaAnimadaCool
 
         private Panel CrearPanelItem(string texto, Color color, int y)
         {
-            // ahora deja 10 px de margen interno en cada lado
             Panel p = new Panel()
             {
                 Size = new Size(panelContenedor.Width - 20, panelHeight),
